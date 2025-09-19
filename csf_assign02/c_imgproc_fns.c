@@ -5,10 +5,7 @@
 #include "imgproc.h"
 
 uint32_t make_pixel(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    return ((uint32_t)r << 24) |
-           ((uint32_t)g << 16) |
-           ((uint32_t)b << 8)  |
-           (uint32_t)a;
+    return ((uint32_t)r << 24) | ((uint32_t)g << 16) | ((uint32_t)b << 8) | (uint32_t)a;
 }
 
 //! Transform the color component values in each input pixel
@@ -153,8 +150,7 @@ void imgproc_emboss( struct Image *input_img, struct Image *output_img ) {
       uint8_t a = input & 0xFF;
 
       if(i == 0 || j == 0) {
-        //output_img->data[i * width + j] = MAKE_PIXEL(128, 128, 128, a);
-        output_img->data[i * width + j] = ((uint32_t)128 << 24) | ((uint32_t)128 << 16) | ((uint32_t)128 << 8) | a;
+        output_img->data[i * width + j] = make_pixel(128, 128, 128, a);
       } else {
         uint32_t neighbor = input_img->data[(i - 1) * width + (j - 1)];
         
