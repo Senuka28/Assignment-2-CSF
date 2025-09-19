@@ -152,18 +152,19 @@ void imgproc_emboss( struct Image *input_img, struct Image *output_img ) {
       uint8_t a = input & 0xFF;
 
       if(i == 0 || j == 0) {
-        output_img->data[i * width + j] = MAKE_PIXEL(128, 128, 128, a);
+        //output_img->data[i * width + j] = MAKE_PIXEL(128, 128, 128, a);
+        output_img->data[i * width + j] = ((uint32_t)128 << 24) | ((uint32_t)128 << 16) | ((uint32_t)128 << 8) | a;
       } else {
         uint32_t neighbor = input_img->data[(i - 1) * width + (j - 1)];
         
         // Extract color components
-        int r  = (input >> 24) & 0xFF;
-        int g  = (input >> 16) & 0xFF;
-        int b  = (input >>  8) & 0xFF;
+        int r = (input >> 24) & 0xFF;
+        int g = (input >> 16) & 0xFF;
+        int b = (input >>  8) & 0xFF;
 
         int nr = (neighbor >> 24) & 0xFF;
         int ng = (neighbor >> 16) & 0xFF;
-        int nb = (neighbor >>  8) & 0xFF;
+        int nb = (neighbor >> 8) & 0xFF;
 
         // Differences
         int dr = nr - r;
@@ -173,22 +174,24 @@ void imgproc_emboss( struct Image *input_img, struct Image *output_img ) {
         // make sure difference is red first if tied
         int diff = dr;
         if (abs(dg) > abs(diff) || (abs(dg) == abs(diff) && diff != dr)) {
-            diff = dg;
+          diff = dg;
         }
         
         if (abs(db) > abs(diff) || (abs(db) == abs(diff) && diff != dr && diff != dg)) {
-                    diff = db;
+          diff = db;
         }
 
         // gray = 128 + diff within bounds
         int gray = 128 + diff;
-        if (gray < 0) gray = 0;
-        if (gray > 255) gray = 255;
+        if (gray < 0) {
+          gray = 0;
+        }
+        if (gray > 255) {
+          gray = 255;
+        }
 
         // Create pixel
-        output_img->data[i * width + j] =
-                    ((uint32_t)gray << 24) | ((uint32_t)gray << 16) | ((uint32_t)gray << 8) | a;
-
+        output_img->data[i * width + j] = ((uint32_t)gray << 24) | ((uint32_t)gray << 16) | ((uint32_t)gray << 8) | a;
       }
     }
   }
