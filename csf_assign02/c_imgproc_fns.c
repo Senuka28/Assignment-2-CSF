@@ -98,7 +98,7 @@ void imgproc_ellipse( struct Image *input_img, struct Image *output_img ) {
       int inequality_left = (10000 * x * x) / (a * a) + (10000 * y * y) / (b * b);
 
       if (inequality_left <= 10000) {
-        output_img->data[row * width_val + col] = input_img[row * width_val + col];
+        output_img->data[row * width_val + col] = input_img->data[row * width_val + col];
       } else {
         output_img->data[row * width_val + col] = 0xFF000000;
       }
