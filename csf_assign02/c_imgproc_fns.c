@@ -105,7 +105,8 @@ void imgproc_ellipse( struct Image *input_img, struct Image *output_img ) {
       if (inequality_left <= 10000) {
         output_img->data[row * width_val + col] = input_img->data[row * width_val + col];
       } else {
-        output_img->data[row * width_val + col] = 0xFF000000;
+        uint32_t alpha = input_img->data[row * width_val + col] & 0x000000FF;
+        output_img->data[row * width_val + col] = alpha;
       }
     }
   }
