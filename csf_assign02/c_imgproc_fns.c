@@ -22,7 +22,12 @@ void imgproc_complement( struct Image *input_img, struct Image *output_img ) {
   // manipulate the pixels for complement
   for (int i = 0; i < size; i++) {
     uint32_t pixel_data = input_img->data[i];
-    uint32_t alpha_save = pixel_data & 
+
+    uint32_t alpha_save = pixel_data & 0xFF000000; // only stores alpha bits
+    uint32_t rgb_save = pixel_data & 0x00FFFFFF; // only stores the rbg bits
+    uint32_t rgb_flip = (~rgb_save) & 0x00FFFFFF; // flip the rgb bits
+
+    output_img->data[i] = alpha_save | rgb_flip; 
   }
 }
 
