@@ -81,6 +81,30 @@ int imgproc_transpose( struct Image *input_img, struct Image *output_img ) {
 //!                   transformed pixels should be stored)
 void imgproc_ellipse( struct Image *input_img, struct Image *output_img ) {
   // TODO: implement
+  int width_val = input_img->width;
+  int height_val = input_img->height;
+
+  int a = width_val / 2;
+  int b = height_val / 2;
+
+  int center_x = a;
+  int center_y = b;
+
+  for (int row = 0; row < height_val; row++) {
+    for (int col = 0; col < width_val; col++) {
+      int x = col - center_x;
+      int y = row - center_y;
+
+      int inequality_left = (10000 * x * x) / (a * a) + (10000 * y * y) / (b * b);
+
+      if (inequality_left <= 10000) {
+        output_img->data[row * width_val + col] = input_img[row * width_val + col];
+      } else {
+        output_img->data[row * width_val + col] = 0xFF000000;
+      }
+    }
+  }
+
 }
 
 //! Transform the input image using an "emboss" effect. The pixels
