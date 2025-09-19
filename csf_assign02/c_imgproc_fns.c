@@ -41,7 +41,17 @@ void imgproc_complement( struct Image *input_img, struct Image *output_img ) {
 //!         transformation can't be applied because the image
 //!         width and height are not the same
 int imgproc_transpose( struct Image *input_img, struct Image *output_img ) {
-  // TODO: implement
+  //check if square
+  if(input_img->width != input_img->height){
+    return 0;
+  }
+  for(int i = 0; i < input_img->height; i++){
+    for(int j = 0; j < input_img->width; j++){
+      output_img->data[j * input_img->width + i] 
+      = input_img->data[i * input_img->width + j]; 
+    }
+  }
+
   return 1;
 }
 
