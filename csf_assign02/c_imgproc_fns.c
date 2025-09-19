@@ -17,6 +17,13 @@
 //!                   transformed pixels should be stored)
 void imgproc_complement( struct Image *input_img, struct Image *output_img ) {
   // TODO: implement
+  int size = input_img->width * input_img->height;
+
+  // manipulate the pixels for complement
+  for (int i = 0; i < size; i++) {
+    uint32_t pixel_data = input_img->data[i];
+    uint32_t alpha_save = pixel_data & 
+  }
 }
 
 //! Transform the input image by swapping the row and column
