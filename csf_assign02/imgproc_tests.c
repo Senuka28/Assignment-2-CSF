@@ -236,58 +236,58 @@ void test_make_pixel() {
     // Test 1: All zeros
     uint32_t px = make_pixel(0, 0, 0, 0);
     assert(px == 0x00000000);
-    assert(GET_R(px) == 0);
-    assert(GET_G(px) == 0);
-    assert(GET_B(px) == 0);
-    assert(GET_A(px) == 0);
+    assert(get_r(px) == 0);
+    assert(get_g(px) == 0);
+    assert(get_b(px) == 0);
+    assert(get_a(px) == 0);
 
     // Test 2: All max values
     px = make_pixel(255, 255, 255, 255);
     assert(px == 0xFFFFFFFF);
-    assert(GET_R(px) == 255);
-    assert(GET_G(px) == 255);
-    assert(GET_B(px) == 255);
-    assert(GET_A(px) == 255);
+    assert(get_r(px) == 255);
+    assert(get_g(px) == 255);
+    assert(get_b(px) == 255);
+    assert(get_a(px) == 255);
 
     // Test 3: Red only
     px = make_pixel(255, 0, 0, 0);
     assert(px == 0xFF000000);
-    assert(GET_R(px) == 255);
-    assert(GET_G(px) == 0);
-    assert(GET_B(px) == 0);
-    assert(GET_A(px) == 0);
+    assert(get_r(px) == 255);
+    assert(get_g(px) == 0);
+    assert(get_b(px) == 0);
+    assert(get_a(px) == 0);
 
     // Test 4: Green only
     px = make_pixel(0, 255, 0, 0);
     assert(px == 0x00FF0000);
-    assert(GET_R(px) == 0);
-    assert(GET_G(px) == 255);
-    assert(GET_B(px) == 0);
-    assert(GET_A(px) == 0);
+    assert(get_r(px) == 0);
+    assert(get_g(px) == 255);
+    assert(get_b(px) == 0);
+    assert(get_a(px) == 0);
 
     // Test 5: Blue only
     px = make_pixel(0, 0, 255, 0);
     assert(px == 0x0000FF00);
-    assert(GET_R(px) == 0);
-    assert(GET_G(px) == 0);
-    assert(GET_B(px) == 255);
-    assert(GET_A(px) == 0);
+    assert(get_r(px) == 0);
+    assert(get_g(px) == 0);
+    assert(get_b(px) == 255);
+    assert(get_a(px) == 0);
 
     // Test 6: Alpha only
     px = make_pixel(0, 0, 0, 255);
     assert(px == 0x000000FF);
-    assert(GET_R(px) == 0);
-    assert(GET_G(px) == 0);
-    assert(GET_B(px) == 0);
-    assert(GET_A(px) == 255);
+    assert(get_r(px) == 0);
+    assert(get_g(px) == 0);
+    assert(get_b(px) == 0);
+    assert(get_a(px) == 255);
 
     // Test 7: Mixed values
     px = make_pixel(0x12, 0x34, 0x56, 0x78);
     assert(px == 0x12345678);
-    assert(GET_R(px) == 0x12);
-    assert(GET_G(px) == 0x34);
-    assert(GET_B(px) == 0x56);
-    assert(GET_A(px) == 0x78);
+    assert(get_r(px) == 0x12);
+    assert(get_g(px) == 0x34);
+    assert(get_b(px) == 0x56);
+    assert(get_a(px) == 0x78);
 
 }
 

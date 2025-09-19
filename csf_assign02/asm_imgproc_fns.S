@@ -126,3 +126,29 @@ imgproc_emboss:
 /*
 vim:ft=gas:
 */
+
+
+.globl get_a
+get_a:
+    /* TODO: implement */
+    ret
+
+	.globl get_r
+get_r:
+    /* TODO: implement */
+    ret
+
+	.globl get_g
+get_g:
+    /* TODO: implement */
+    ret
+
+	.globl get_b
+get_b:
+    /* TODO: implement */
+    ret
+
+	.globl make_pixel
+make_pixel:
+    /* TODO: implement */
+    ret
