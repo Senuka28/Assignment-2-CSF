@@ -11,6 +11,24 @@ uint32_t make_pixel(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
            (uint32_t)a;
 }
 
+uint8_t get_r(uint32_t px) {
+    return (px >> 24) & 0xFF;
+}
+
+uint8_t get_g(uint32_t px) {
+    return (px >> 16) & 0xFF;
+}
+
+uint8_t get_b(uint32_t px) {
+    return (px >> 8) & 0xFF;
+}
+
+uint8_t get_a(uint32_t px) {
+    return px & 0xFF;
+}
+
+
+
 //! Transform the color component values in each input pixel
 //! by applying the bitwise complement operation. I.e., each bit
 //! in the color component information should be inverted
@@ -150,7 +168,7 @@ void imgproc_emboss( struct Image *input_img, struct Image *output_img ) {
   for(int i = 0; i < height; i++) {
     for (int j = 0; j < width; j++) {
       uint32_t input = input_img->data[i * width + j];
-      uint8_t a = input & 0xFF;
+      uint8_t a = get_a(input);
 
       if(i == 0 || j == 0) {
         //output_img->data[i * width + j] = MAKE_PIXEL(128, 128, 128, a);
@@ -159,13 +177,13 @@ void imgproc_emboss( struct Image *input_img, struct Image *output_img ) {
         uint32_t neighbor = input_img->data[(i - 1) * width + (j - 1)];
         
         // Extract color components
-        int r = (input >> 24) & 0xFF;
-        int g = (input >> 16) & 0xFF;
-        int b = (input >>  8) & 0xFF;
+        int r  = get_r(input);
+        int g  = get_g(input);
+        int b  = get_b(input);
 
-        int nr = (neighbor >> 24) & 0xFF;
-        int ng = (neighbor >> 16) & 0xFF;
-        int nb = (neighbor >> 8) & 0xFF;
+        int nr = get_r(neighbor);
+        int ng = get_g(neighbor);
+        int nb = get_b(neighbor);
 
         // Differences
         int dr = nr - r;
