@@ -107,11 +107,14 @@ void imgproc_ellipse( struct Image *input_img, struct Image *output_img ) {
   int width_val = input_img->width;
   int height_val = input_img->height;
 
-  int a = width_val / 2;
-  int b = height_val / 2;
+  /*if (width_val == 0 || height_val == 0) {
+    return;
+  }*/
 
-  int center_x = a;
-  int center_y = b;
+  int a = width_val / 2;   
+  int b = height_val / 2;  
+  int center_x = width_val / 2;
+  int center_y = height_val / 2;
 
   for (int row = 0; row < height_val; row++) {
     for (int col = 0; col < width_val; col++) {
@@ -123,8 +126,8 @@ void imgproc_ellipse( struct Image *input_img, struct Image *output_img ) {
       if (inequality_left <= 10000) {
         output_img->data[row * width_val + col] = input_img->data[row * width_val + col];
       } else {
-        uint32_t alpha = input_img->data[row * width_val + col] & 0x000000FF;
-        output_img->data[row * width_val + col] = alpha;
+        output_img->data[row * width_val + col] = make_pixel(0, 0, 0, 255);
+
       }
     }
   }
