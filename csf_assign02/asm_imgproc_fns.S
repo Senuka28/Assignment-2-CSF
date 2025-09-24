@@ -33,8 +33,49 @@
  */
 	.globl imgproc_complement
 imgproc_complement:
-	/* TODO: implement */
-	ret
+	pushq %rbp # save the old base pointer on our stack
+	movq %rsp, %rbp # sets up our new stack frame
+
+	# assembly to load the width and height, multiply for size
+	movl IMAGE_WIDTH_OFFSET(%rdi), %r8d # load the input->width
+	movl IMAGE_HEIGHT_OFFSET(%rdi), %r9d # load the input->height
+	imull %r9d, %r8d # multiply for size
+
+	# pointers for our data
+	movq IMAGE_DATA_OFFSET(%rdi), %r11 # establish a pointer to the input pixels
+	movq IMAGE_DATA_OFFSET(%rsi), %r12 # establish a pointer to the output pixels
+
+.Lloop:
+	testl %r8d, %r8d # check remaining pixel count and if it's 0
+	jz .Ldone # if 0 then jump to the done section
+
+	movl (%r11), %eax # from input put 32-bit pixel into eax
+	
+	# save the alpha
+	movl %eax, %ecx # copy the pixel into ecx
+	andl $0x000000FF, %ecx # only keep alpha bits through masking
+
+	# save the rgb
+	movl %eax, %edx # copy the pixel into ecx
+	andl $0xFFFFFF00, %edx # only keep rgb bits through masking
+
+	# flip the rgb
+	notl %edx # on rgb part perform a bitwise not
+	andl $0xFFFFFF00, %edx # make sure only the rgb bits stay by clearing bottom 8 bits 
+
+	# calculate the result then store
+	orl %ecx, %edx # add the original alpha with our newly flipped rgb
+	movl %edx, (%r12) # this new pixel now written into output
+
+	# advance the pointers
+	addq $4, %r11 # input pointer to next pixel now, 4 bytes
+	addq $4, %r12 # output pointer to next pixel now, 4 bytes
+	decl %r8d # pixel counter is decremented here
+	jmp .Lloop # repeat this loop
+
+.Ldone:
+	popq %rbp # restore the old base pointer
+	ret # just return from func
 
 /*
  *  Transform the input image by swapping the row and column
@@ -55,7 +96,16 @@ imgproc_complement:
  */
 	.globl imgproc_transpose
 imgproc_transpose:
-	/* TODO: implement */
+	movl (%rdi), %eax		/* load width into eax */
+	movl 4(%rdi), %ecx		/* load height into ecx */
+
+	cmpl $ecx, %eax 		/* check if square */ 
+	jne not_square			/* jump to return case */
+
+not_square:
+	xorl %eax, %eax
+	ret
+
 	ret
 
 /*
