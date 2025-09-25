@@ -47,7 +47,7 @@ imgproc_complement:
 
 .Lloop:
 	testl %r8d, %r8d # check remaining pixel count and if it's 0
-	jz .Ldone # if 0 then jump to the done section
+	jz .Ldone_complement # if 0 then jump to the done section
 
 	movl (%r11), %eax # from input put 32-bit pixel into eax
 	
@@ -73,7 +73,7 @@ imgproc_complement:
 	decl %r8d # pixel counter is decremented here
 	jmp .Lloop # repeat this loop
 
-.Ldone:
+.Ldone_complement:
 	popq %rbp # restore the old base pointer
 	ret # just return from func
 
@@ -96,17 +96,79 @@ imgproc_complement:
  */
 	.globl imgproc_transpose
 imgproc_transpose:
-	movl (%rdi), %eax		/* load width into eax */
-	movl 4(%rdi), %ecx		/* load height into ecx */
+	pushq   %rbp			/* save caller's frame pointer */
+    movq    %rsp, %rbp		/* set up frame pointer */
 
-	cmpl $ecx, %eax 		/* check if square */ 
-	jne not_square			/* jump to return case */
+	/* save callee saved registers */
+	pushq %r12				
+    pushq %r13
+    pushq %r14
+    pushq %r15
+	
+	movl (%rdi), %r12d		/* load width into r12 */
+	movl 4(%rdi), %r13d		/* load height into r13 */
 
-not_square:
-	xorl %eax, %eax
-	ret
+	cmpl %r13d, %r12d 		/* check if square */ 
+	jne .Lnot_square		/* jump to return case */
 
-	ret
+	movq 8(%rdi), %r10		/* load input_img->data into r10 */
+	movq 8(%rsi), %r11		/* load output_img->data into r11 */
+
+	xorl %r14d, %r14d		/* initialize i to 0 */
+
+.Louter_loop:
+	cmpl %r13d, %r14d		/* compares i with height */
+	jge .Ldone_transpose	/* jump to return case if i >= height */
+
+	xorl %r15d, %r15d		/* initialize j to 0 */
+
+.Linner_loop:
+	cmpl %r12d, %r15d		/* compare j to width */
+	jge .Lnext_i			/* if j >= width increment i */
+
+	movl %r14d, %eax     	/* move i to eax */
+    imull %r12d, %eax     	/* multiply i * width */
+    addl %r15d, %eax    	/* i * width + j */
+
+    movl (%r10,%rax,4), %edx  /* load pixel from input_data */
+	
+	movl %r15d, %ecx		/* ecx = j */
+    imull %r12d, %ecx		/* ecx = j * width */
+    addl %r14d, %ecx		/* ecx = j * width + i */
+
+	movl %edx, (%r11,%rcx,4)	/* write pixel data to output_data */
+
+	incl %r15d              /* j++ */
+    jmp .Linner_loop			/* repeat loop */
+
+.Lnext_i:
+    incl %r14d           	/* i++ */
+    jmp .Louter_loop			/* repeat outer loop */
+
+.Ldone_transpose:
+    movl $1, %eax        /* return 1 */
+
+/* Restore saved registers and return */
+    popq %r15
+    popq %r14
+    popq %r13
+    popq %r12
+    popq %rbp
+    ret
+
+
+.Lnot_square:
+	xorl %eax, %eax			/* return 0 */
+
+/* Restore saved registers and return */
+	popq %r15
+    popq %r14
+    popq %r13
+    popq %r12
+    popq %rbp
+    ret
+
+	
 
 /*
  *  Transform the input image by copying only those pixels that are
