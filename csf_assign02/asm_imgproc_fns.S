@@ -30,52 +30,70 @@
  *  %rdi - pointer to the input Image
  *  %rsi - pointer to the output Image (in which the
  *         transformed pixels should be stored)
+ *
+ *  Register use:
+ *  %r12 - pointer for our input pixel array
+ *  %r13 - pointer for our output pixel array
+ *  %r14d - pixel count that remains
+ *  %ebx - working register + current pixel val
+ *  %ecx - alpha part
+ *  %edx - rgb part
  */
 	.globl imgproc_complement
 imgproc_complement:
-	pushq %rbp # save the old base pointer on our stack
-	movq %rsp, %rbp # sets up our new stack frame
+	pushq %rbp                       /* save the old base pointer on our stack */
+	movq %rsp, %rbp                  /* sets up our new stack frame */
 
-	# assembly to load the width and height, multiply for size
-	movl IMAGE_WIDTH_OFFSET(%rdi), %r8d # load the input->width
-	movl IMAGE_HEIGHT_OFFSET(%rdi), %r9d # load the input->height
-	imull %r9d, %r8d # multiply for size
+	pushq %r12                       /* save callee-saved register (input pointer) */
+    pushq %r13                       /* save callee-saved register (output pointer) */
+    pushq %r14                       /* save callee-saved register (pixel counter) */
+    pushq %rbx                       /* save callee-saved register (scratch/pixel) */
 
-	# pointers for our data
-	movq IMAGE_DATA_OFFSET(%rdi), %r11 # establish a pointer to the input pixels
-	movq IMAGE_DATA_OFFSET(%rsi), %r12 # establish a pointer to the output pixels
+	/* assembly to load the width and height, multiply for size */
+	movl IMAGE_WIDTH_OFFSET(%rdi), %r14d /* load the input->width */
+	movl IMAGE_HEIGHT_OFFSET(%rdi), %ebx /* load the input->height */
+	imull %ebx, %r14d                /* multiply for size */
+
+	/* pointers for our data */
+	movq IMAGE_DATA_OFFSET(%rdi), %r12 /* establish a pointer to the input pixels */
+	movq IMAGE_DATA_OFFSET(%rsi), %r13 /* establish a pointer to the output pixels */
 
 .Lloop:
-	testl %r8d, %r8d # check remaining pixel count and if it's 0
-	jz .Ldone_complement # if 0 then jump to the done section
+	testl %r14d, %r14d               /* check remaining pixel count and if it's 0 */
+	jz .Ldone_complement             /* if 0 then jump to the done section */
 
-	movl (%r11), %eax # from input put 32-bit pixel into eax
+	movl (%r12), %ebx                /* from input put 32-bit pixel into eax */
 	
-	# save the alpha
-	movl %eax, %ecx # copy the pixel into ecx
-	andl $0x000000FF, %ecx # only keep alpha bits through masking
+	/* save the alpha */
+	movl %ebx, %ecx                  /* copy the pixel into ecx */
+	andl $0x000000FF, %ecx           /* only keep alpha bits through masking */
 
-	# save the rgb
-	movl %eax, %edx # copy the pixel into ecx
-	andl $0xFFFFFF00, %edx # only keep rgb bits through masking
+	/* save the rgb */
+	movl %ebx, %edx                  /* copy the pixel into ecx */
+	andl $0xFFFFFF00, %edx           /* only keep rgb bits through masking */
 
-	# flip the rgb
-	notl %edx # on rgb part perform a bitwise not
-	andl $0xFFFFFF00, %edx # make sure only the rgb bits stay by clearing bottom 8 bits 
+	/* flip the rgb */
+	notl %edx                        /* on rgb part perform a bitwise not */
+	andl $0xFFFFFF00, %edx           /* make sure only the rgb bits stay by clearing bottom 8 bits */ 
 
-	# calculate the result then store
-	orl %ecx, %edx # add the original alpha with our newly flipped rgb
-	movl %edx, (%r12) # this new pixel now written into output
+	/* calculate the result then store */
+	orl %ecx, %edx                   /* add the original alpha with our newly flipped rgb */
+	movl %edx, (%r13)                /* this new pixel now written into output */
 
-	# advance the pointers
-	addq $4, %r11 # input pointer to next pixel now, 4 bytes
-	addq $4, %r12 # output pointer to next pixel now, 4 bytes
-	decl %r8d # pixel counter is decremented here
-	jmp .Lloop # repeat this loop
+	/* advance the pointers */
+	addq $4, %r12                    /* input pointer to next pixel now, 4 bytes */
+	addq $4, %r13                    /* output pointer to next pixel now, 4 bytes */
+	decl %r14d                       /* pixel counter is decremented here */
+	jmp .Lloop                       /* repeat this loop */
 
 .Ldone_complement:
-	popq %rbp # restore the old base pointer
-	ret # just return from func
+	popq %rbx                        /* restore caller's %rbx */
+    popq %r14                        /* restore caller's %r14 */
+    popq %r13                        /* restore caller's %r13 */
+    popq %r12                        /* restore caller's %r12 */
+    popq %rbp                        /* restore the old base pointer */
+
+	ret                              /* just return from func */
 
 /*
  *  Transform the input image by swapping the row and column
@@ -89,6 +107,17 @@ imgproc_complement:
  *  %rdi - pointer to the input Image
  *  %rsi - pointer to the output Image (in which the
  *                    transformed pixels should be stored)
+ *
+ *  Register use:
+ *  %r12d - the width of the image
+ *  %r13d - the height of the image
+ *  %r10 - the pointer to input->data
+ *  %r11 - the pointer to output->data
+ *  %r14d - row index
+ *  %r15d - col index
+ *  %eax - temporary for the index computation and return val
+ *  %ecx - other index computation
+ *  %edx - the pixel val
  * 
  *  @return 1 if the transformation succeeded, or 0 if the
  *          transformation can't be applied because the image
