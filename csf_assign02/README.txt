@@ -1,3 +1,8 @@
-TODO: names of team members
+TODO: Caroline Jia, Senuka Abeysinghe
 
-TODO: contributions of each team member
+TODO: 
+
+Senuka: imgproc_complement, imgproc_ellipse, assembly code for complement function
+
+Caroline: imgproc_transpose, imgproc_emboss, unit tests, assembly code for tranpose function
+
