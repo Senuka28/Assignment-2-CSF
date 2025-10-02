@@ -220,6 +220,25 @@ imgproc_transpose:
  *  %rdi - pointer to the input Image
  *  %rsi - pointer to the output Image (in which the
  *                    transformed pixels should be stored)
+ *
+ *  Register use:
+ *  %rbx - row index
+ *  %r12d - width of image measured in pixels
+ *  %r13d - height of image measured in pixels
+ *  %r14 - the pointer to input_img->data
+ *  %r15 - the pointer to output_img->data
+ *  %ecx - col index
+ *  %eax - temporary register for any computation
+ *  %edx - temporary register for x, x^2, and pixel vals
+ *  %esi - holds the vertical distance from image's center
+ *  %edi - holds calculated linear pixel index and divisor vals
+ *  %r9d - holds result of first ellipse term (10000*x^2 / a^2) for future addition\
+ *
+ *  Local variables in stack frame:
+ *  -4(%rbp) - value of a
+ *  -8(%rbp) - value of b
+ *  -12(%rbp) - value of center_x
+ *  -16(%rbp) - value of center_y
  */
 	.globl imgproc_ellipse
 imgproc_ellipse:
