@@ -1,3 +1,4 @@
+
 /*
  * x86-64 assembly language implementations of functions
  */
@@ -197,8 +198,6 @@ imgproc_transpose:
     popq %rbp
     ret
 
-	
-
 /*
  *  Transform the input image by copying only those pixels that are
  *  within an ellipse centered within the bounds of the image.
@@ -357,7 +356,7 @@ imgproc_ellipse:
     addq    $32, %rsp                /* free the 32 bytes for locals */
     popq    %rbp                     /* restore the old base pointer */
     ret                              /* just return from func */
-
+/*
  * Transform the input image using an "emboss" effect.
  *
  * This version CALLS the helper functions (get_a, get_r, etc.)
